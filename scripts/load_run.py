@@ -158,7 +158,7 @@ def is_finished():
 
 def reverse_readline(filename, buf_size=8192):
     """a generator that returns the lines of a file in reverse order"""
-    with open(filename, "r") as fh:
+    with open(filename, "r", encoding="utf-8") as fh:
         segment = None
         offset = 0
         fh.seek(0, os.SEEK_END)
