@@ -13,7 +13,7 @@ read_name = "read.properties"
 
 asterixdb = "/home/ubuntu/asterixdb/opt/local"
 
-table_paras = (0, 2, 3, 5, 10, 15, 20, 25, 30)
+table_paras = (0, 2, 3, 5, 10, 15, 20, 25)
 
 dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 res_path = os.path.join(dir_path, "results")
@@ -24,7 +24,7 @@ if not os.path.isdir(res_path):
 if not os.path.isdir(srv_path):
     os.mkdir(srv_path)
 
-ycsb = os.path.join(os.path.dirname(dir_path), "ycsb-0.14.0-SNAPSHOT", "bin", "ycsb")
+ycsb = os.path.join(dir_path, "ycsb-0.14.0-SNAPSHOT", "bin", "ycsb")
 
 load_path = os.path.join(dir_path, "configs", load_name)
 read_path = os.path.join(dir_path, "configs", read_name)
@@ -218,7 +218,7 @@ def check_log(logp):
 
 
 def copy_logs(operation, num_components):
-    logp = os.path.join(srv_path, "{0}_{1}.log".format(operation, num_components))
+    logp = os.path.join(srv_path, "{0}_{1}.log.gzip".format(operation, num_components))
     outf = gzip.open(logp, "wt")
     for src in glob.glob("{0}/logs/*.log".format(asterixdb)):
         with open(src, "r") as inf:
