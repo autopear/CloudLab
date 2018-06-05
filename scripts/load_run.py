@@ -16,8 +16,8 @@ asterixdb = "/home/ubuntu/asterixdb/opt/local"
 table_paras = (0, 2, 3, 5, 10, 15, 20, 25)
 
 dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-res_path = os.path.join(dir_path, "results")
-srv_path = os.path.join(dir_path, "server_logs")
+res_path = os.path.join(dir_path, "results_with_bf")
+srv_path = os.path.join(dir_path, "server_logs_with_bf")
 
 if not os.path.isdir(res_path):
     os.mkdir(res_path)
@@ -242,7 +242,7 @@ def run_workload(operation, config, num_components, outf):
     fn = os.path.basename(config).replace(".properties", "")
     prefix = os.path.join(res_path, "{0}_{1}".format(fn, num_components))
     cmd = "python3.6 \"{0}\" {1} asterixdb -P \"{2}\"" \
-          " -p exportfile=\"{3}.txt\" -s > \"{3}.log\"" \
+          " -p exportfile=\"{3}.txt\" -s -threads 1 > \"{3}.log\"" \
         .format(ycsb, operation, config, prefix)
     if outf is not None:
         outf.write("{0}\t{1}\n".format(fn, get_server_time()))
