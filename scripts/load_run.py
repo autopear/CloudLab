@@ -218,8 +218,7 @@ def check_log(logp):
 
 
 def copy_logs(operation, num_components):
-    logp = os.path.join(srv_path, "{0}_{1}.log.gzip".format(operation, num_components))
-    outf = gzip.open(logp, "wt")
+    outf = gzip.open(os.path.join(srv_path, "{0}_{1}.log.gzip".format(operation, num_components)), "wt")
     for src in glob.glob("{0}/logs/*.log".format(asterixdb)):
         with open(src, "r") as inf:
             for line in inf:
