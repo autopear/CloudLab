@@ -6,3 +6,11 @@ Host node2
 	Hostname node-2
 	User ubuntu
 	IdentityFile ~/.ssh/id_rsa
+Host node3
+	Hostname node-3
+	User ubuntu
+	IdentityFile ~/.ssh/id_rsa
+Host node4
+	Hostname node-4
+	User ubuntu
+	IdentityFile ~/.ssh/id_rsa

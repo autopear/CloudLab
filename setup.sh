@@ -16,3 +16,4 @@ su ubuntu
 ssh-keygen -f /home/ubuntu/.ssh/id_rsa -t rsa -N ''
 mv /home/ubuntu/cloudlab/ssh/config /home/ubuntu/.ssh/config
 chmod 644 /home/ubuntu/.ssh/config
+sudo chown -R ubuntu:ubuntu /home/ubuntu/.ssh
