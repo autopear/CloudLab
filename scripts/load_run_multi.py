@@ -105,7 +105,7 @@ def create_feed():
     cmd = """USE ycsb;
 CREATE FEED userfeed WITH {
     "adapter-name":"socket_adapter",
-    "sockets":"localhost:""" + str(feed_port) + """",
+    "sockets":"node-1:""" + str(feed_port) + """",
     "address-type":"IP",
     "type-name":"usertype",
     "format":"adm",
@@ -173,10 +173,10 @@ def run_workload(operation, config, num_components, outf):
     logf.close()
 
     fn = os.path.basename(config).replace(".properties", "")
-    prefix = os.path.join(res_path, "{0}_{1}".format(fn, num_components))
+    path_prefix = os.path.join(res_path, "{0}_{1}".format(fn, num_components))
     cmd = "python3.6 \"{0}\" {1} asterixdb -P \"{2}\"" \
           " -p exportfile=\"{3}.txt\" -s -threads 1 > \"{3}.log\"" \
-        .format(ycsb, operation, config, prefix)
+        .format(ycsb, operation, config, path_prefix)
     if outf is not None:
         outf.write("{0}\t{1}\n".format(fn, get_server_time()))
     call(cmd, shell=True)
