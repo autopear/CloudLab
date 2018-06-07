@@ -10,6 +10,7 @@ curl https://bootstrap.pypa.io/get-pip.py | sudo python3.6
 sudo pip3.6 install requests
 git clone https://github.com/autopear/CloudLab.git /home/ubuntu/cloudlab
 unzip /home/ubuntu/cloudlab/asterix-server-0.9.4-SNAPSHOT-binary-assembly.zip -d /home/ubuntu/asterixdb
+mv -f /home/ubuntu/cloudlab/configs/cc_multi_w_bf.conf /home/ubuntu/asterixdb/opt/local/conf/cc_multi.conf
 sudo chown -R ubuntu:ubuntu /home/ubuntu/*
 su ubuntu
 ssh-keygen -f /home/ubuntu/.ssh/id_rsa -t rsa -N ''
