@@ -154,8 +154,8 @@ class copyNodeLogs(threading.Thread):
              " {2}/logs/node-{0}-service.log"
              " {2}/logs/nc-node_{0}.log\""
              .format(self.nodeid, dir_path, asterixdb, self.prefix), shell=True)
-        call("scp node{0}:{1}/logs/node-{0}.log.gzip {2}/{3}_node-{0}.log.gzip"
-             .format(self.nodeid, asterixdb, srv_path, self.prefix), shell=True)
+        call("scp node{0}:{1}/logs/{2}_node-{0}.log.gzip {3}/{3}_node-{0}.log.gzip"
+             .format(self.nodeid, asterixdb, self.prefix, srv_path), shell=True)
         print("Copied node {0}".format(self.nodeid))
 
 
