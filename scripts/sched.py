@@ -1,14 +1,15 @@
 #!/usr/bin/python3
 
 import os
+import requests
 import time
-import threading
-import socket
 from datetime import datetime
+import threading
 from subprocess import call, check_output
 
 
-table_paras = (3, 4, 5, 8, 10, 12, 15, 20, 25, 30, 40, 60, 80, 100, 150)
+#table_paras = (0, 2, 3, 4, 5, 8, 10, 12, 15, 20, 25, 30, 40, 60, 80, 100, 150)
+table_paras = (60, 80, 100, 150, 0)
 bf_enabled = False
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -17,7 +18,6 @@ if not os.path.isdir(log_path):
     os.mkdir(log_path)
 
 task_running = False
-
 
 def get_instance():
     res = check_output("nova list", shell=True)\
@@ -37,7 +37,7 @@ class ThreadTask(threading.Thread):
         self.is_load = is_load
 
     def run(self):
-        global task_running
+        global task_running, sem
         if self.enabled:
             bf = "true"
         else:
@@ -47,8 +47,15 @@ class ThreadTask(threading.Thread):
         else:
             op = "read"
 
-        call("ssh db \"python3.6 /home/ubuntu/cloudlab/scripts/{0}_k.py {1} {2}; exit\""
+        print("Start experiment")
+        flagf = os.path.join(dir_path, "{0}_{1}_done".format(op, self.k))
+        if os.path.isfile(flagf):
+            os.remove(flagf)
+        call("ssh db3 \"nohup python3.6 /home/ubuntu/cloudlab/scripts/{0}_k.py {1} {2} &\""
              .format(op, bf, self.k), shell=True)
+        while not os.path.isfile(flagf):
+            time.sleep(1)
+        print("Done experiment")
 
         task_running = False
 
@@ -78,21 +85,23 @@ class ThreadMigration(threading.Thread):
         outf = open(os.path.join(self.lp, "{0}_{1}_{2}.log".format(op, bf, self.k)), "w")
         current_id = self.get_last_migration_id() + 1
         while task_running:
-            print("Migrating with {0}".format(current_id))
+            print("{0} Migrating with {1}".format(datetime.now().strftime("%H:%M:%S.%f"), current_id))
             call("nova live-migration {0}".format(self.uuid), shell=True)
             while True:
                 succ, st, ed = self.check_status(current_id)
                 if succ == 1:
                     outf.write("{0}\t{1}\n"
-                               .format(st.strftime("%Y-%m-%d %H:%M:%S"), ed.strftime("%Y-%m-%d %H:%M:%S")))
+                               .format(st.strftime("%Y-%m-%d %H:%M:%S.%f"), ed.strftime("%Y-%m-%d %H:%M:%S.%f")))
                     outf.flush()
-                    print("Done Migration with {0}".format(current_id))
+                    print("{0} Done migration with {1}".format(datetime.now().strftime("%H:%M:%S.%f"), current_id))
                     break
                 elif succ == -1:
                     break
                 else:
                     time.sleep(0.5)
             current_id += 1
+            if not task_running:
+                break
             time.sleep(120)
         outf.close()
 
@@ -148,56 +157,27 @@ class ThreadMigration(threading.Thread):
     #     return ret
 
 
-def db_up():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    res = sock.connect_ex(("128.110.155.150", 22))
-    if res == 0:
-        return True
-    else:
-        return False
-
-
-def reboot_db():
-    call("nova reboot --hard {0}".format(iid), shell=True)
-    # while not db_up():
-    #     time.sleep(0.5)
-    # print("DB is alive")
-    time.sleep(10)
-    call("ssh db \"rm -fr /home/ubuntu/asterixdb/opt/local/data /home/ubuntu/asterixdb/opt/local/logs; exit\"",
-         shell=True)
-    print("Data removed")
-
-
 def task(enabled, k):
     global task_running
-
-    reboot_db()
-
-    task_running = True
-
     tload = ThreadTask(enabled, k, True)
     tmigload = ThreadMigration(enabled, k, True, log_path, iid)
 
+    task_running = True
     tload.start()
     tmigload.start()
 
     tload.join()
     tmigload.join()
 
-    del tload, tmigload
-
-    task_running = True
-
     tread = ThreadTask(enabled, k, False)
     tmigread = ThreadMigration(enabled, k, False, log_path, iid)
 
+    task_running = True
     tread.start()
     tmigread.start()
 
     tread.join()
     tmigread.join()
-
-    del tread, tmigread
 
     if enabled:
         print("Done with bloom filter K={0}".format(k))

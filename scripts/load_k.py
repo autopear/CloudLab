@@ -300,6 +300,9 @@ def run_exp():
 
     outf.close()
 
+    print("Notify Controller")
+    call("ssh ctl \"touch ~/exp/load_{0}_done\"".format(K), shell=True)
+
     print("Done {0}".format(K))
 
 
