@@ -154,7 +154,7 @@ class copyNodeLogs(threading.Thread):
              " {2}/logs/node-{0}-service.log"
              " {2}/logs/nc-node_{0}.log\""
              .format(self.nodeid, dir_path, asterixdb, self.prefix), shell=True)
-        call("scp node{0}:{1}/logs/{2}_node-{0}.log.gzip {3}/{3}_node-{0}.log.gzip"
+        call("scp node{0}:{1}/logs/{2}_node-{0}.log.gzip {3}/{2}_node-{0}.log.gzip"
              .format(self.nodeid, asterixdb, self.prefix, srv_path), shell=True)
         print("Copied node {0}".format(self.nodeid))
 
@@ -198,9 +198,9 @@ def run_workload(operation, config, num_components, outf):
 
 def run_exp(num_components):
     if num_components > 1:
-        print("Starting with {0} components".format(num_components))
+        print("Loading with {0} components".format(num_components))
     else:
-        print("Starting with {0} component".format(num_components))
+        print("Loading with {0} component".format(num_components))
 
     if not create_dataverse():
         print("Failed to create dataverse")
